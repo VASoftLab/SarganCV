@@ -239,6 +239,17 @@ release\main.obj: main.cpp c:\OpenCV-480\build\include\opencv2\opencv.hpp \
 		c:\OpenCV-480\build\include\opencv2\video.hpp \
 		c:\OpenCV-480\build\include\opencv2\video\tracking.hpp \
 		c:\OpenCV-480\build\include\opencv2\video\background_segm.hpp \
+		nadjieb\streamer.hpp \
+		nadjieb\utils\version.hpp \
+		nadjieb\net\http_request.hpp \
+		nadjieb\net\http_response.hpp \
+		nadjieb\net\listener.hpp \
+		nadjieb\net\socket.hpp \
+		nadjieb\utils\platform.hpp \
+		nadjieb\utils\non_copyable.hpp \
+		nadjieb\utils\runnable.hpp \
+		nadjieb\net\publisher.hpp \
+		nadjieb\net\topic.hpp \
 		neuralnetdetector.h
 
 release\neuralnetdetector.obj: neuralnetdetector.cpp neuralnetdetector.h \
