@@ -56,25 +56,33 @@ int main()
     // Бесконечный цикл с захватом видео и детектором
     while(cv::waitKey(1) < 1)
     {
+        // Захват текущего кадра
         source >> frame;
         if (frame.empty())
         {
             cv::waitKey();
             break;
         }
+
+        ///////////////////////////////////////////////////////////////////////
         // Отработка детектора
+        ///////////////////////////////////////////////////////////////////////
         cv::Mat img = detector.process(frame);
+
         // Результаты работы детектора
         std::vector<int> class_ids = detector.get_class_ids();
         std::vector<float> confidences = detector.get_confidences();
         std::vector<cv::Rect> boxes = detector.get_boxes();
         std::vector<std::string> classes = detector.get_classes();
+        ///////////////////////////////////////////////////////////////////////
 
         ///////////////////////////////////////////////////////////////////////
         // Наложение подложки
+        ///////////////////////////////////////////////////////////////////////
         double alpha = 0.5;
         cv::Mat overlay;
         img.copyTo(overlay);
+
         // Создаем фон под текстом
         cv::rectangle(
             overlay,
@@ -86,7 +94,9 @@ int main()
         cv::addWeighted(overlay, alpha, img, 1 - alpha, 0, img);
         ///////////////////////////////////////////////////////////////////////
 
-        // Поиск бокса с максимальной площадью
+        ///////////////////////////////////////////////////////////////////////
+        // Поиск бокса цели с максимальной площадью
+        ///////////////////////////////////////////////////////////////////////
         int bigestArea = INT_MIN;
         int bigestIndex = -1;
         int boxIndex = -1;
@@ -100,34 +110,93 @@ int main()
                 bigestArea = b.area();
             }
         }
+        ///////////////////////////////////////////////////////////////////////
 
-        // Расчет центра бокса с изображением
+        ///////////////////////////////////////////////////////////////////////
+        // Отрисовка бокса и прицела цели
+        ///////////////////////////////////////////////////////////////////////
         if (boxes.size() > 0)
         {
             cv::Point center = (boxes[bigestIndex].br() + boxes[bigestIndex].tl()) * 0.5;
-            //std::cout << "X: " << center.x << "; Y: " << center.y << std::endl;
-            //std::string textCenter = "X: " + std::to_string(center.x) + "; Y: " + std::to_string(center.y);
 
-            // Накладываем текст c координатами центра картинки
-            //cv::putText(img, textCenter, cv::Point(10, img.rows / 2), cv::FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(255, 255, 255),  2);
+            // Отрисовка прицела в центре фрейма цели
+            cv::Point objectBoxPt1;
+            cv::Point objectBoxPt2;
 
-            // Координаты центра фрейма
-            //float X2 = FRAME_WIDTH / 2;
-            //float Y2 = FRAME_HEIGHT / 2;
+            objectBoxPt1.x = center.x - SIGHT_WIDTH / 2;
+            objectBoxPt1.y = center.y - SIGHT_WIDTH / 2;
+            objectBoxPt2.x = center.x + SIGHT_WIDTH / 2;
+            objectBoxPt2.y = center.y + SIGHT_WIDTH / 2;
+            cv::rectangle(img, objectBoxPt1, objectBoxPt2, CV_RGB(255, 0, 0), 2, 0);
 
+            // Перекрестие (фрейм объекта)
+            cv::Point objectCrossPtV1;
+            cv::Point objectCrossPtV2;
+            cv::Point objectCrossPtH1;
+            cv::Point objectCrossPtH2;
+
+            objectCrossPtV1.x = center.x;
+            objectCrossPtV1.y = center.y - SIGHT_WIDTH / 6;
+            objectCrossPtV2.x = center.x;
+            objectCrossPtV2.y = center.y + SIGHT_WIDTH / 6;
+
+            objectCrossPtH1.x = center.x - SIGHT_WIDTH / 6;
+            objectCrossPtH1.y = center.y;
+            objectCrossPtH2.x = center.x + SIGHT_WIDTH / 6;
+            objectCrossPtH2.y = center.y;
+
+            cv::line(img, objectCrossPtV1, objectCrossPtV2, CV_RGB(255, 0, 0), 2, 0);
+            cv::line(img, objectCrossPtH1, objectCrossPtH2, CV_RGB(255, 0, 0), 2, 0);
+        }
+        ///////////////////////////////////////////////////////////////////////
+
+        ///////////////////////////////////////////////////////////////////////
+        // Расчет центральной точки бортовой системы наведения
+        ///////////////////////////////////////////////////////////////////////
+        cv::Point boardBoxPt1;
+        cv::Point boardBoxPt2;
+
+        // Координаты бокса прицела
+        boardBoxPt1.x = img.cols / 2 - SIGHT_WIDTH;
+        boardBoxPt1.y = img.rows / 2 - SIGHT_WIDTH;
+        boardBoxPt2.x = img.cols / 2 + SIGHT_WIDTH;
+        boardBoxPt2.y = img.rows / 2 + SIGHT_WIDTH;
+
+        std::string direction;
+        ///////////////////////////////////////////////////////////////////////
+
+        ///////////////////////////////////////////////////////////////////////
+        // Расчет управления
+        ///////////////////////////////////////////////////////////////////////
+        if (boxes.size() > 0)
+        {
+            // Расчет центра бокса с обнаруженной целью
+            cv::Point center = (boxes[bigestIndex].br() + boxes[bigestIndex].tl()) * 0.5;
+
+            // Угол между прицелом и целью
             int angle = findAngleF(FRAME_WIDTH, center.x);
-            //std::string textAngle = "Angle: " + std::to_string(angle);
-            //cv::putText(img, textAngle, cv::Point(10, img.rows / 3), cv::FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(255, 255, 255),  2);
 
             // Команда управления лево / право
-            std::string direction = center.x > FRAME_WIDTH / 2 ? "RIGTH" : "LEFT";
-            //std::string textCommand = "Command: " + textCMD;
-            //cv::putText(img, textCommand, cv::Point(10, img.rows / 5), cv::FONT_HERSHEY_DUPLEX, 1.0, CV_RGB(255, 255, 255),  2);
+            direction = center.x > FRAME_WIDTH / 2 ? "RIGTH" : "LEFT";
 
+            // Если цель находится в границах прицела - удерживаем курс
+            //if ((boardBoxPt1.x <= center.x) && (center.x <= boardBoxPt2.x) &&
+            //    (boardBoxPt1.y <= center.y) && (center.y <= boardBoxPt2.y))
+            //{
+            //    direction = "HOLD";
+            //}
+
+            if ((boardBoxPt1.x <= center.x) && (center.x <= boardBoxPt2.x))
+            {
+                direction = "HOLD";
+            }
+
+            // Время работы детектора
             std::stringstream ssTime;
             ssTime << std::fixed << std::setprecision(2) << detector.get_inference();
             std::string inference = ssTime.str();
 
+            // Строка инфорации
             std::string textInfo = " CMD: (" + direction + ":" + std::to_string(angle) + ")" +
                                    " TARGET: (" + std::to_string(center.x) + ";" + std::to_string(center.y) + ")" +
                                    " RES: (" + std::to_string((int)FRAME_WIDTH) + "x" + std::to_string((int)FRAME_HEIGHT) + ")" +
@@ -139,69 +208,43 @@ int main()
             std::string textInfo = " RES: (" + std::to_string((int)FRAME_WIDTH) + "x" + std::to_string((int)FRAME_HEIGHT) + ")";
             cv::putText(img, textInfo, cv::Point(10, img.rows - 10), cv::FONT_HERSHEY_PLAIN, 1, CV_RGB(0, 0, 255), 1);
         }
+        ///////////////////////////////////////////////////////////////////////
+        // Отрисовка бортовых бокса и прицела
+        ///////////////////////////////////////////////////////////////////////
 
-        // Отрисовка прицела в центре фрейма
-        cv::Point sightPt1;
-        cv::Point sightPt2;
-
-        sightPt1.x = img.cols / 2 - SIGHT_WIDTH;
-        sightPt1.y = img.rows / 2 - SIGHT_WIDTH;
-        sightPt2.x = img.cols / 2 + SIGHT_WIDTH;
-        sightPt2.y = img.rows / 2 + SIGHT_WIDTH;
-        cv::rectangle(img, sightPt1, sightPt2, CV_RGB(255, 255, 255), 2, 0);
+        if (direction == "HOLD")
+            cv::rectangle(img, boardBoxPt1, boardBoxPt2, CV_RGB(255, 0, 0), 2, 0);
+        else
+            cv::rectangle(img, boardBoxPt1, boardBoxPt2, CV_RGB(255, 255, 255), 2, 0);
 
         // Перекрестие (основное изображение)
-        cv::Point crossPtV1;
-        cv::Point crossPtV2;
-        cv::Point crossPtH1;
-        cv::Point crossPtH2;
+        cv::Point boardCrossPtV1;
+        cv::Point boradCrossPtV2;
+        cv::Point boardCrossPtH1;
+        cv::Point boardCrossPtH2;
 
-        crossPtV1.x = img.cols / 2;
-        crossPtV1.y = img.rows / 2 - SIGHT_WIDTH / 4;
-        crossPtV2.x = img.cols / 2;
-        crossPtV2.y = img.rows / 2 + SIGHT_WIDTH / 4;
+        boardCrossPtV1.x = img.cols / 2;
+        boardCrossPtV1.y = img.rows / 2 - SIGHT_WIDTH / 4;
+        boradCrossPtV2.x = img.cols / 2;
+        boradCrossPtV2.y = img.rows / 2 + SIGHT_WIDTH / 4;
 
-        crossPtH1.x = img.cols / 2 - SIGHT_WIDTH / 4;
-        crossPtH1.y = img.rows / 2;
-        crossPtH2.x = img.cols / 2 + SIGHT_WIDTH / 4;
-        crossPtH2.y = img.rows / 2;
+        boardCrossPtH1.x = img.cols / 2 - SIGHT_WIDTH / 4;
+        boardCrossPtH1.y = img.rows / 2;
+        boardCrossPtH2.x = img.cols / 2 + SIGHT_WIDTH / 4;
+        boardCrossPtH2.y = img.rows / 2;
 
-        cv::line(img, crossPtV1, crossPtV2, CV_RGB(255, 255, 255), 2, 0);
-        cv::line(img, crossPtH1, crossPtH2, CV_RGB(255, 255, 255), 2, 0);
-
-        if (boxes.size() > 0)
+        if (direction == "HOLD")
         {
-            cv::Point center = (boxes[bigestIndex].br() + boxes[bigestIndex].tl()) * 0.5;
-
-            // Отрисовка прицела в центре фрейма
-            cv::Point detectPt1;
-            cv::Point detectPt2;
-
-            detectPt1.x = center.x - SIGHT_WIDTH / 2;
-            detectPt1.y = center.y - SIGHT_WIDTH / 2;
-            detectPt2.x = center.x + SIGHT_WIDTH / 2;
-            detectPt2.y = center.y + SIGHT_WIDTH / 2;
-            cv::rectangle(img, detectPt1, detectPt2, CV_RGB(255, 0, 0), 2, 0);
-
-            // Перекрестие (фрейм объекта)
-            cv::Point detectPtV1;
-            cv::Point detectPtV2;
-            cv::Point detectPtH1;
-            cv::Point detectPtH2;
-
-            detectPtV1.x = center.x;
-            detectPtV1.y = center.y - SIGHT_WIDTH / 6;
-            detectPtV2.x = center.x;
-            detectPtV2.y = center.y + SIGHT_WIDTH / 6;
-
-            detectPtH1.x = center.x - SIGHT_WIDTH / 6;
-            detectPtH1.y = center.y;
-            detectPtH2.x = center.x + SIGHT_WIDTH / 6;
-            detectPtH2.y = center.y;
-
-            cv::line(img, detectPtV1, detectPtV2, CV_RGB(255, 0, 0), 2, 0);
-            cv::line(img, detectPtH1, detectPtH2, CV_RGB(255, 0, 0), 2, 0);
+            cv::line(img, boardCrossPtV1, boradCrossPtV2, CV_RGB(255, 0, 0), 2, 0);
+            cv::line(img, boardCrossPtH1, boardCrossPtH2, CV_RGB(255, 0, 0), 2, 0);
         }
+        else
+        {
+            cv::line(img, boardCrossPtV1, boradCrossPtV2, CV_RGB(255, 255, 255), 2, 0);
+            cv::line(img, boardCrossPtH1, boardCrossPtH2, CV_RGB(255, 255, 255), 2, 0);
+        }
+        ///////////////////////////////////////////////////////////////////////
+
 
         // Вывод результатов (опционально)
         if (true)
