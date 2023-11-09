@@ -11,3 +11,7 @@ build-SarganCV-Release/.qtc_clangd/
 build-SarganCV-Release/
 build-SarganCV-Replacement_for_Desktop_Qt_6_3_1_MinGW_64_bit-Release/
 SarganCV/SarganStreamer/release/
+Build/.qtc_clangd/
+Build/SarganStreamer/debug/
+Build/SarganYOLO/debug/
+SarganCV/SarganYOLO/release/
