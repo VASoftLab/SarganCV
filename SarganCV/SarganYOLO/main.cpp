@@ -5,6 +5,9 @@
 #include <cerrno>
 #include <filesystem>
 
+#include "nadjieb/streamer.hpp"
+using MJPEGStreamer = nadjieb::MJPEGStreamer;
+
 #include "neuralnetdetector.h"
 
 /** Параметры картинки */
@@ -32,6 +35,19 @@ int main()
     // Источник изображений по умолчанию
     cv::VideoCapture source(1);
 
+    ///////////////////////////////////////////////////////////////////////////
+    // Подготовка стримера
+    ///////////////////////////////////////////////////////////////////////////
+    // Задаем качество картинки
+    std::vector<int> params = {cv::IMWRITE_JPEG_QUALITY, 90};
+    // Создаем объект стримера
+    MJPEGStreamer streamer;
+    // Буфер для работы с потоком
+    std::vector<uchar> streamerBuf;
+    // Запуск стримера
+    streamer.start(8080);
+    ///////////////////////////////////////////////////////////////////////////
+
     // Получить разрешение камеры по горизонтали и вертикали
     float FRAME_WIDTH = source.get(cv::CAP_PROP_FRAME_WIDTH);
     float FRAME_HEIGHT  = source.get(cv::CAP_PROP_FRAME_HEIGHT);
@@ -53,6 +69,7 @@ int main()
     NeuralNetDetector detector(model_path.u8string(), classes_path.u8string(), IMG_WIDTH, IMG_HEIGHT);
 
     cv::Mat frame;
+
     // Бесконечный цикл с захватом видео и детектором
     while(cv::waitKey(1) < 1)
     {
@@ -275,7 +292,17 @@ int main()
 
             cv::imshow("SarganYOLO", img);
         }
+
+        // Отправляем результат в поток
+        cv::imencode(".jpg", img, streamerBuf, params);
+
+        // Выгрузка изображения в поток http://localhost:8080/sargan
+        streamer.publish("/sargan", std::string(streamerBuf.begin(), streamerBuf.end()));
     }
+
+    // Остановка стримера
+    streamer.stop();
+
     cv::waitKey(0);
     return 0;
 }
