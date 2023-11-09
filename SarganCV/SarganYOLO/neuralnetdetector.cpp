@@ -127,8 +127,8 @@ cv::Mat NeuralNetDetector::post_process(cv::Mat &img, std::vector<cv::Mat> &outp
 
     float *data = (float *)outputs[0].data;
 
-    const int dimensions = class_name.size() + 5;
-    const int rows = 25200;
+    const size_t dimensions = class_name.size() + 5;
+    const size_t rows = 25200;
     // Iterate through 25200 detections.
     for (int i = 0; i < rows; ++i)
     {
@@ -138,7 +138,7 @@ cv::Mat NeuralNetDetector::post_process(cv::Mat &img, std::vector<cv::Mat> &outp
         {
             float * classes_scores = data + 5;
             // Create a 1x85 Mat and store class scores of 80 classes.
-            cv::Mat scores(1, class_name.size(), CV_32FC1, classes_scores);
+            cv::Mat scores(1, (int)class_name.size(), CV_32FC1, classes_scores);
             // Perform minMaxLoc and acquire index of best class score.
             cv::Point class_id;
             double max_class_score;
@@ -227,7 +227,7 @@ cv::Mat NeuralNetDetector::process(cv::Mat &img)
     // The function getPerfProfile returns the overall time for inference(t) and the timings for each of the layers(in layersTimes)
     std::vector<double> layersTimes;
     double freq = cv::getTickFrequency();
-    NeuralNetDetector::inference_time = network.getPerfProfile(layersTimes) / freq;
+    NeuralNetDetector::inference_time = network.getPerfProfile(layersTimes) / (float)freq;
     return res;
 }
 

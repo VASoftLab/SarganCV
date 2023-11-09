@@ -308,5 +308,6 @@ int main()
     streamer.stop();
 
     cv::waitKey(0);
+    cv::destroyAllWindows();
     return 0;
 }

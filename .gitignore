@@ -7,3 +7,7 @@ build-SarganCV-Desktop_Qt_6_3_1_GCC_64bit-Debug/
 
 SarganCV/SarganCV.pro.user.6f36fa6
 SarganCV/SarganCV.pro.user.bd6359d
+build-SarganCV-Release/.qtc_clangd/
+build-SarganCV-Release/
+build-SarganCV-Replacement_for_Desktop_Qt_6_3_1_MinGW_64_bit-Release/
+SarganCV/SarganStreamer/release/
