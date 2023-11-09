@@ -30,7 +30,11 @@ NeuralNetDetector::NeuralNetDetector(const std::string model, const std::string 
     }
 }
 
-errno_t /*error_t*/ NeuralNetDetector::read_classes(const std::string file_path)
+#ifdef _WIN32
+    errno_t NeuralNetDetector::read_classes(const std::string file_path)
+#else
+    error_t NeuralNetDetector::read_classes(const std::string file_path)
+#endif
 {
     std::ifstream classes_file(file_path);
     std::string line;
@@ -49,9 +53,17 @@ errno_t /*error_t*/ NeuralNetDetector::read_classes(const std::string file_path)
     return 0;
 }
 
-errno_t /*error_t*/ NeuralNetDetector::init_network(const std::string model_path, const std::string classes_path) {
-    errno_t /*error_t*/ err = read_classes(classes_path);
-
+#ifdef _WIN32
+errno_t NeuralNetDetector::init_network(const std::string model_path, const std::string classes_path)
+#else
+error_t NeuralNetDetector::init_network(const std::string model_path, const std::string classes_path)
+#endif
+{
+#ifdef _WIN32
+    errno_t err = read_classes(classes_path);
+#else
+    error_t err = read_classes(classes_path);
+#endif
     if (err == 0)
     {
         network = cv::dnn::readNetFromONNX(model_path);
@@ -164,7 +176,7 @@ cv::Mat NeuralNetDetector::post_process(cv::Mat &img, std::vector<cv::Mat> &outp
     int bigestIndex = -1;
     int boxIndex = -1;
 
-    for (int i = 0; i < indices.size(); i++)
+    for (size_t i = 0; i < indices.size(); i++)
     {
         int idx = indices[i];
         cv::Rect box = boxes[idx];
@@ -222,7 +234,7 @@ cv::Mat NeuralNetDetector::process(cv::Mat &img)
 std::string NeuralNetDetector::get_info(void)
 {
     std::string str = "";
-    for (int i = 0; i < classes_id_set.size(); i++)
+    for (size_t i = 0; i < classes_id_set.size(); i++)
     {
         str += classes_set[i];
         str += ": ";

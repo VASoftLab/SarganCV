@@ -2,6 +2,7 @@
 #define NEURALNETDETECTOR_H
 
 #include <opencv2/opencv.hpp>
+#include <opencv2/dnn.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -42,10 +43,19 @@ private:
     std::vector<std::string> classes_set;
     /** Время обработки */
     float inference_time;
+
+#ifdef _WIN32
     /** Получить строковые значения классов */
-    errno_t /*error_t*/ read_classes(const std::string file_path);
+    errno_t read_classes(const std::string file_path);
     /** Инициализация нейросети */
-    errno_t /*error_t*/ init_network(const std::string model_path, const std::string classes_path);
+    errno_t init_network(const std::string model_path, const std::string classes_path);
+#else
+    /** Получить строковые значения классов */
+    error_t read_classes(const std::string file_path);
+    /** Инициализация нейросети */
+    error_t init_network(const std::string model_path, const std::string classes_path);
+#endif
+
     /** Отрисовка метки */
     void draw_label(cv::Mat& img, std::string label, int left, int top);
     /** Предобработка результатов */

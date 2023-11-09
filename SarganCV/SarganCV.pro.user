@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 11.0.2, 2023-11-09T10:42:29. -->
+<!-- Written by QtCreator 11.0.2, 2023-11-09T13:39:32. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
-  <value type="QByteArray">{6f36fa6d-eccb-436b-9f75-f1e3216fe401}</value>
+  <value type="QByteArray">{bd6359d1-e57d-48cc-afc0-ea59878d71ef}</value>
  </data>
  <data>
   <variable>ProjectExplorer.Project.ActiveTarget</variable>
@@ -75,7 +75,7 @@
     <value type="bool" key="ClangTools.AnalyzeOpenFiles">true</value>
     <value type="bool" key="ClangTools.BuildBeforeAnalysis">true</value>
     <value type="QString" key="ClangTools.DiagnosticConfig">Builtin.DefaultTidyAndClazy</value>
-    <value type="int" key="ClangTools.ParallelJobs">4</value>
+    <value type="int" key="ClangTools.ParallelJobs">2</value>
     <value type="bool" key="ClangTools.PreferConfigFile">true</value>
     <valuelist type="QVariantList" key="ClangTools.SelectedDirs"/>
     <valuelist type="QVariantList" key="ClangTools.SelectedFiles"/>
@@ -88,16 +88,16 @@
   <variable>ProjectExplorer.Project.Target.0</variable>
   <valuemap type="QVariantMap">
    <value type="QString" key="DeviceType">Desktop</value>
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Desktop Qt 6.3.2 MSVC2019 64bit</value>
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Desktop Qt 6.3.2 MSVC2019 64bit</value>
-   <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">qt.qt6.632.win64_msvc2019_64_kit</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">Desktop Qt 6.3.1 GCC 64bit</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName">Desktop Qt 6.3.1 GCC 64bit</value>
+   <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">qt.qt6.631.gcc_64_kit</value>
    <value type="qlonglong" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
    <value type="qlonglong" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
    <value type="qlonglong" key="ProjectExplorer.Target.ActiveRunConfiguration">1</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">
     <value type="int" key="EnableQmlDebugging">0</value>
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">C:\SourceCode\SarganCV\SarganCV</value>
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">C:/SourceCode/SarganCV/build-SarganCV-Desktop_Qt_6_3_2_MSVC2019_64bit-Debug</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/va/Sources/SarganCV/build-SarganCV-Desktop_Qt_6_3_1_GCC_64bit-Debug</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">/home/va/Sources/SarganCV/build-SarganCV-Desktop_Qt_6_3_1_GCC_64bit-Debug</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
@@ -135,8 +135,8 @@
     <value type="int" key="Qt4ProjectManager.Qt4BuildConfiguration.BuildConfiguration">2</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.1">
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">C:\SourceCode\SarganCV\build-SarganCV-Desktop_Qt_6_3_2_MSVC2019_64bit-Release</value>
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">C:/SourceCode/SarganCV/build-SarganCV-Desktop_Qt_6_3_2_MSVC2019_64bit-Release</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/va/Sources/SarganCV/build-SarganCV-Desktop_Qt_6_3_1_GCC_64bit-Release</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">/home/va/Sources/SarganCV/build-SarganCV-Desktop_Qt_6_3_1_GCC_64bit-Release</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
@@ -176,8 +176,8 @@
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.2">
     <value type="int" key="EnableQmlDebugging">0</value>
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">C:\SourceCode\SarganCV\build-SarganCV-Desktop_Qt_6_3_2_MSVC2019_64bit-Profile</value>
-    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">C:/SourceCode/SarganCV/build-SarganCV-Desktop_Qt_6_3_2_MSVC2019_64bit-Profile</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/va/Sources/SarganCV/build-SarganCV-Desktop_Qt_6_3_1_GCC_64bit-Profile</value>
+    <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory.shadowDir">/home/va/Sources/SarganCV/build-SarganCV-Desktop_Qt_6_3_1_GCC_64bit-Profile</value>
     <valuemap type="QVariantMap" key="ProjectExplorer.BuildConfiguration.BuildStepList.0">
      <valuemap type="QVariantMap" key="ProjectExplorer.BuildStepList.Step.0">
       <value type="bool" key="ProjectExplorer.BuildStep.Enabled">true</value>
@@ -238,12 +238,12 @@
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="bool" key="PE.EnvironmentAspect.PrintOnRun">false</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/SourceCode/SarganCV/SarganCV/SarganStreamer/SarganStreamer.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/SourceCode/SarganCV/SarganCV/SarganStreamer/SarganStreamer.pro</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/va/Sources/SarganCV/SarganCV/SarganStreamer/SarganStreamer.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/va/Sources/SarganCV/SarganCV/SarganStreamer/SarganStreamer.pro</value>
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">C:/SourceCode/SarganCV/SarganCV/SarganStreamer</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/va/Sources/SarganCV/build-SarganCV-Desktop_Qt_6_3_1_GCC_64bit-Debug/SarganStreamer</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.1">
     <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
@@ -253,14 +253,12 @@
     <value type="int" key="PE.EnvironmentAspect.Base">2</value>
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="bool" key="PE.EnvironmentAspect.PrintOnRun">false</value>
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/SourceCode/SarganCV/SarganCV/SarganYOLO/SarganYOLO.pro</value>
-    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">C:/SourceCode/SarganCV/SarganCV/SarganYOLO/SarganYOLO.pro</value>
-    <value type="int" key="RunConfiguration.UseCppDebugger">0</value>
-    <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">false</value>
+    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:/home/va/Sources/SarganCV/SarganCV/SarganYOLO/SarganYOLO.pro</value>
+    <value type="QString" key="ProjectExplorer.RunConfiguration.BuildKey">/home/va/Sources/SarganCV/SarganCV/SarganYOLO/SarganYOLO.pro</value>
+    <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="bool" key="RunConfiguration.UseTerminal">false</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">C:/SourceCode/SarganCV/SarganCV/SarganYOLO</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/va/Sources/SarganCV/build-SarganCV-Desktop_Qt_6_3_1_GCC_64bit-Debug/SarganYOLO</value>
    </valuemap>
    <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">2</value>
   </valuemap>
