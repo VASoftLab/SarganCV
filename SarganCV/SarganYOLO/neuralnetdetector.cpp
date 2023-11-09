@@ -130,7 +130,7 @@ cv::Mat NeuralNetDetector::post_process(cv::Mat &img, std::vector<cv::Mat> &outp
     const size_t dimensions = class_name.size() + 5;
     const size_t rows = 25200;
     // Iterate through 25200 detections.
-    for (int i = 0; i < rows; ++i)
+    for (size_t i = 0; i < rows; ++i)
     {
         float confidence = data[4];
         // Discard bad detections and continue.

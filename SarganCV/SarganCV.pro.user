@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<!-- Written by QtCreator 11.0.2, 2023-11-09T15:05:26. -->
+<!-- Written by QtCreator 11.0.2, 2023-11-09T21:33:48. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -93,7 +93,7 @@
    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">qt.qt6.631.gcc_64_kit</value>
    <value type="qlonglong" key="ProjectExplorer.Target.ActiveBuildConfiguration">0</value>
    <value type="qlonglong" key="ProjectExplorer.Target.ActiveDeployConfiguration">0</value>
-   <value type="qlonglong" key="ProjectExplorer.Target.ActiveRunConfiguration">0</value>
+   <value type="qlonglong" key="ProjectExplorer.Target.ActiveRunConfiguration">1</value>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.BuildConfiguration.0">
     <value type="int" key="EnableQmlDebugging">0</value>
     <value type="QString" key="ProjectExplorer.BuildConfiguration.BuildDirectory">/home/va/Sources/SarganCV/build-SarganCV-Desktop_Qt_6_3_1_GCC_64bit-Debug</value>
@@ -243,7 +243,7 @@
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/va/Sources/SarganCV/SarganCV/SarganStreamer</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/va/Sources/SarganCV/build-SarganCV-Desktop_Qt_6_3_1_GCC_64bit-Debug/SarganStreamer</value>
    </valuemap>
    <valuemap type="QVariantMap" key="ProjectExplorer.Target.RunConfiguration.1">
     <value type="bool" key="Analyzer.Perf.Settings.UseGlobalSettings">true</value>
@@ -258,7 +258,7 @@
     <value type="bool" key="RunConfiguration.UseCppDebuggerAuto">true</value>
     <value type="bool" key="RunConfiguration.UseLibrarySearchPath">true</value>
     <value type="bool" key="RunConfiguration.UseQmlDebuggerAuto">true</value>
-    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/va/Sources/SarganCV/SarganCV/SarganYOLO</value>
+    <value type="QString" key="RunConfiguration.WorkingDirectory.default">/home/va/Sources/SarganCV/build-SarganCV-Desktop_Qt_6_3_1_GCC_64bit-Debug/SarganYOLO</value>
    </valuemap>
    <value type="qlonglong" key="ProjectExplorer.Target.RunConfigurationCount">2</value>
   </valuemap>

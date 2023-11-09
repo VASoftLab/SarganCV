@@ -5,6 +5,11 @@
 #include <cerrno>
 #include <filesystem>
 
+#include <opencv2/opencv.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/videoio.hpp>
+#include <opencv2/highgui.hpp>
+
 #include "nadjieb/streamer.hpp"
 using MJPEGStreamer = nadjieb::MJPEGStreamer;
 
@@ -36,8 +41,42 @@ int findAngleF(double resolution, int cx)
 
 int main()
 {
+    cv::VideoCapture source;
+
     // Источник изображений по умолчанию
-    cv::VideoCapture source(0);
+    // cv::VideoCapture source(1, cv::CAP_GSTREAMER);
+#ifdef _WIN32
+    source.open(0, cv::CAP_ANY);
+#else
+    // source.open(0, cv::CAP_ANY);
+    source.open(0, cv::CAP_GSTREAMER);
+#endif
+    source.set(cv::CAP_PROP_FPS, 30);
+
+    //if (!source.isOpened())
+    //{
+    //    std::cerr << "ERROR! Left camera not ready!" << std::endl;
+    //    std::cin.get();
+    //    return -1;
+    //}
+    //else
+    //{
+    //    std::cout << "LEFT camera test -- SUCCESS" << std::endl;
+    //}
+
+    cv::Mat frame;
+
+    //for (;;)
+    //{
+    //    source >> frame;
+    //    cv::imshow("Web Camera", frame);
+
+    //    if (cv::waitKey(5) >= 0)
+    //        break;
+    //}
+    //cv::destroyAllWindows();
+
+    //return 0;
 
     ///////////////////////////////////////////////////////////////////////////
     // Подготовка стримера
@@ -72,7 +111,7 @@ int main()
     // NeuralNetDetector detector(model_path.u8string(), classes_path.u8string(), FRAME_WIDTH, FRAME_HEIGHT);
     NeuralNetDetector detector(model_path.u8string(), classes_path.u8string(), (int)IMG_WIDTH, (int)IMG_HEIGHT);
 
-    cv::Mat frame;
+    // cv::Mat frame;
 
     // Бесконечный цикл с захватом видео и детектором
     while(cv::waitKey(1) < 1)
@@ -307,7 +346,7 @@ int main()
     // Остановка стримера
     streamer.stop();
 
-    cv::waitKey(0);
+    // cv::waitKey(0);
     cv::destroyAllWindows();
     return 0;
 }
