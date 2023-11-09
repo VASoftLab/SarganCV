@@ -9,12 +9,12 @@
 #include <cerrno>
 
 /** Параметры обработки */
-static const float SCORE_THRESHOLD      = 0.50;
-static const float NMS_THRESHOLD        = 0.45;
-static const float CONFIDENCE_THRESHOLD = 0.45;
+static const float SCORE_THRESHOLD      = 0.50f;
+static const float NMS_THRESHOLD        = 0.45f;
+static const float CONFIDENCE_THRESHOLD = 0.45f;
 
 /** Параметры шрифтов */
-static const float FONT_SCALE = 0.7;
+static const float FONT_SCALE = 0.7f;
 static const int   THICKNESS  = 1;
 
 /** Флаг отображения метки */

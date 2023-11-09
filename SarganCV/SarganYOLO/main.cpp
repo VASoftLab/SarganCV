@@ -13,7 +13,11 @@ using MJPEGStreamer = nadjieb::MJPEGStreamer;
 /** Параметры картинки */
 static const float IMG_WIDTH = 640;
 static const float IMG_HEIGHT  = 640;
+///////////////////////////////////////////////////////////////////////////////
+// !!!ЗНАЧЕНИЕ УГЛА ОБЗОРА ДОЛЖНО БЫТЬ ИЗМЕНЕНО ПОД КАМЕРУ НА АППАРАТЕ!!!
+///////////////////////////////////////////////////////////////////////////////
 static const float CAMERA_ANGLE = /*60*/78;
+///////////////////////////////////////////////////////////////////////////////
 
 // Размеры прицела
 static const float SIGHT_WIDTH = 50;
@@ -25,15 +29,15 @@ namespace fs = std::filesystem;
  *   @param cx - абциса центра цели
  *   @return угол между центром фрейма и центром цели
  */
-int findAngleF(float resolution, int cx)
+int findAngleF(double resolution, int cx)
 {
-    return (cx * CAMERA_ANGLE / resolution) - CAMERA_ANGLE / 2;
+    return (int)((cx * CAMERA_ANGLE / resolution) - CAMERA_ANGLE / 2);
 }
 
 int main()
 {
     // Источник изображений по умолчанию
-    cv::VideoCapture source(1);
+    cv::VideoCapture source(0);
 
     ///////////////////////////////////////////////////////////////////////////
     // Подготовка стримера
@@ -49,8 +53,8 @@ int main()
     ///////////////////////////////////////////////////////////////////////////
 
     // Получить разрешение камеры по горизонтали и вертикали
-    float FRAME_WIDTH = source.get(cv::CAP_PROP_FRAME_WIDTH);
-    float FRAME_HEIGHT  = source.get(cv::CAP_PROP_FRAME_HEIGHT);
+    double FRAME_WIDTH = source.get(cv::CAP_PROP_FRAME_WIDTH);
+    double FRAME_HEIGHT  = source.get(cv::CAP_PROP_FRAME_HEIGHT);
 
     std::cout << "Camera resolution: " << FRAME_WIDTH << " x " << FRAME_HEIGHT << std::endl;
 
@@ -66,7 +70,7 @@ int main()
 
     // TODO -- Разобраться, почему падает код с прямоугольными размерами фрейма
     // NeuralNetDetector detector(model_path.u8string(), classes_path.u8string(), FRAME_WIDTH, FRAME_HEIGHT);
-    NeuralNetDetector detector(model_path.u8string(), classes_path.u8string(), IMG_WIDTH, IMG_HEIGHT);
+    NeuralNetDetector detector(model_path.u8string(), classes_path.u8string(), (int)IMG_WIDTH, (int)IMG_HEIGHT);
 
     cv::Mat frame;
 
@@ -140,10 +144,10 @@ int main()
             cv::Point objectBoxPt1;
             cv::Point objectBoxPt2;
 
-            objectBoxPt1.x = center.x - SIGHT_WIDTH / 2;
-            objectBoxPt1.y = center.y - SIGHT_WIDTH / 2;
-            objectBoxPt2.x = center.x + SIGHT_WIDTH / 2;
-            objectBoxPt2.y = center.y + SIGHT_WIDTH / 2;
+            objectBoxPt1.x = center.x - (int)(SIGHT_WIDTH / 2);
+            objectBoxPt1.y = center.y - (int)(SIGHT_WIDTH / 2);
+            objectBoxPt2.x = center.x + (int)(SIGHT_WIDTH / 2);
+            objectBoxPt2.y = center.y + (int)(SIGHT_WIDTH / 2);
             cv::rectangle(img, objectBoxPt1, objectBoxPt2, CV_RGB(255, 0, 0), 2, 0);
 
             // Перекрестие (фрейм объекта)
@@ -153,13 +157,13 @@ int main()
             cv::Point objectCrossPtH2;
 
             objectCrossPtV1.x = center.x;
-            objectCrossPtV1.y = center.y - SIGHT_WIDTH / 6;
+            objectCrossPtV1.y = center.y - (int)(SIGHT_WIDTH / 6);
             objectCrossPtV2.x = center.x;
-            objectCrossPtV2.y = center.y + SIGHT_WIDTH / 6;
+            objectCrossPtV2.y = center.y + (int)(SIGHT_WIDTH / 6);
 
-            objectCrossPtH1.x = center.x - SIGHT_WIDTH / 6;
+            objectCrossPtH1.x = center.x - (int)(SIGHT_WIDTH / 6);
             objectCrossPtH1.y = center.y;
-            objectCrossPtH2.x = center.x + SIGHT_WIDTH / 6;
+            objectCrossPtH2.x = center.x + (int)(SIGHT_WIDTH / 6);
             objectCrossPtH2.y = center.y;
 
             cv::line(img, objectCrossPtV1, objectCrossPtV2, CV_RGB(255, 0, 0), 2, 0);
@@ -174,10 +178,10 @@ int main()
         cv::Point boardBoxPt2;
 
         // Координаты бокса прицела
-        boardBoxPt1.x = img.cols / 2 - SIGHT_WIDTH;
-        boardBoxPt1.y = img.rows / 2 - SIGHT_WIDTH;
-        boardBoxPt2.x = img.cols / 2 + SIGHT_WIDTH;
-        boardBoxPt2.y = img.rows / 2 + SIGHT_WIDTH;
+        boardBoxPt1.x = (int)(img.cols / 2) - (int)SIGHT_WIDTH;
+        boardBoxPt1.y = (int)(img.rows / 2) - (int)SIGHT_WIDTH;
+        boardBoxPt2.x = (int)(img.cols / 2) + (int)SIGHT_WIDTH;
+        boardBoxPt2.y = (int)(img.rows / 2) + (int)SIGHT_WIDTH;
 
         std::string direction;
         ///////////////////////////////////////////////////////////////////////
@@ -240,15 +244,15 @@ int main()
         cv::Point boardCrossPtH1;
         cv::Point boardCrossPtH2;
 
-        boardCrossPtV1.x = img.cols / 2;
-        boardCrossPtV1.y = img.rows / 2 - SIGHT_WIDTH / 4;
-        boradCrossPtV2.x = img.cols / 2;
-        boradCrossPtV2.y = img.rows / 2 + SIGHT_WIDTH / 4;
+        boardCrossPtV1.x = (int)(img.cols / 2);
+        boardCrossPtV1.y = (int)(img.rows / 2) - (int)(SIGHT_WIDTH / 4);
+        boradCrossPtV2.x = (int)(img.cols / 2);
+        boradCrossPtV2.y = (int)(img.rows / 2) + (int)(SIGHT_WIDTH / 4);
 
-        boardCrossPtH1.x = img.cols / 2 - SIGHT_WIDTH / 4;
-        boardCrossPtH1.y = img.rows / 2;
-        boardCrossPtH2.x = img.cols / 2 + SIGHT_WIDTH / 4;
-        boardCrossPtH2.y = img.rows / 2;
+        boardCrossPtH1.x = (int)(img.cols / 2) - (int)(SIGHT_WIDTH / 4);
+        boardCrossPtH1.y = (int)(img.rows / 2);
+        boardCrossPtH2.x = (int)(img.cols / 2) + (int)(SIGHT_WIDTH / 4);
+        boardCrossPtH2.y = (int)(img.rows / 2);
 
         if (direction == "HOLD")
         {
