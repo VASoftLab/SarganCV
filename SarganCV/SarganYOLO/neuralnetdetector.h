@@ -19,6 +19,8 @@ static const int   THICKNESS  = 1;
 
 /** Флаг отображения метки */
 static const bool DRAW_LABEL = false;
+static const bool DIAGNOSTIC_LOG = false;
+static const bool COMMAND_LOG = true;
 
 /** Цветовые константы */
 static cv::Scalar BLACK  = cv::Scalar(0,   0,   0);

@@ -4,11 +4,13 @@
 #include <fstream>
 #include <cerrno>
 #include <filesystem>
+#include <chrono>
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 
 #include "nadjieb/streamer.hpp"
 using MJPEGStreamer = nadjieb::MJPEGStreamer;
@@ -18,6 +20,7 @@ using MJPEGStreamer = nadjieb::MJPEGStreamer;
 /** Параметры картинки */
 static const float IMG_WIDTH = 640;
 static const float IMG_HEIGHT  = 640;
+
 ///////////////////////////////////////////////////////////////////////////////
 // !!!ЗНАЧЕНИЕ УГЛА ОБЗОРА ДОЛЖНО БЫТЬ ИЗМЕНЕНО ПОД КАМЕРУ НА АППАРАТЕ!!!
 ///////////////////////////////////////////////////////////////////////////////
@@ -39,6 +42,21 @@ int findAngleF(double resolution, int cx)
     return (int)((cx * CAMERA_ANGLE / resolution) - CAMERA_ANGLE / 2);
 }
 
+// https://stackoverflow.com/questions/24686846/get-current-time-in-milliseconds-or-hhmmssmmm-format
+std::string time_in_HH_MM_SS_MMM()
+{
+    using namespace std::chrono;
+    auto now = system_clock::now();
+    auto ms = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
+    auto timer = system_clock::to_time_t(now);
+    std::tm bt = *std::localtime(&timer);
+    std::ostringstream oss;
+    oss << std::put_time(&bt, "%H:%M:%S"); // HH:MM:SS
+    oss << '.' << std::setfill('0') << std::setw(3) << ms.count();
+    return oss.str();
+}
+
+
 int main()
 {
     cv::VideoCapture source;
@@ -46,7 +64,9 @@ int main()
     // Источник изображений по умолчанию
     // cv::VideoCapture source(1, cv::CAP_GSTREAMER);
 #ifdef _WIN32
-    source.open(0, cv::CAP_ANY);
+    // source.open(0, cv::CAP_ANY);
+    // Disable Error message: getPluginCandidates Found 2 plugin(s) for GSTREAMER
+    source.open(0, cv::CAP_DSHOW);
 #else
     // source.open(0, cv::CAP_ANY);
     source.open(0, cv::CAP_GSTREAMER);
@@ -95,7 +115,8 @@ int main()
     double FRAME_WIDTH = source.get(cv::CAP_PROP_FRAME_WIDTH);
     double FRAME_HEIGHT  = source.get(cv::CAP_PROP_FRAME_HEIGHT);
 
-    std::cout << "Camera resolution: " << FRAME_WIDTH << " x " << FRAME_HEIGHT << std::endl;
+    if (DIAGNOSTIC_LOG)
+        std::cout << "Camera resolution: " << FRAME_WIDTH << " x " << FRAME_HEIGHT << std::endl;
 
     // Путь к модели и файлу с классами
     fs::path nn_dir ("nn");
@@ -105,7 +126,8 @@ int main()
     const fs::path model_path = fs::current_path() / nn_dir / nn_onnx;
     const fs::path classes_path = fs::current_path() / nn_dir / nn_names;
 
-    std::cout << model_path.u8string() << std::endl;
+    if (DIAGNOSTIC_LOG)
+        std::cout << model_path.u8string() << std::endl;
 
     // TODO -- Разобраться, почему падает код с прямоугольными размерами фрейма
     // NeuralNetDetector detector(model_path.u8string(), classes_path.u8string(), FRAME_WIDTH, FRAME_HEIGHT);
@@ -262,6 +284,12 @@ int main()
                                    " RES: (" + std::to_string((int)FRAME_WIDTH) + "x" + std::to_string((int)FRAME_HEIGHT) + ")" +
                                    " TIME: " + inference;
             cv::putText(img, textInfo, cv::Point(10, img.rows - 10), cv::FONT_HERSHEY_PLAIN, 1, CV_RGB(0, 0, 255), 1);
+
+            if (COMMAND_LOG)
+            {
+                std::string diagnosticInfo = "CMD:\t(" + direction + ":" + std::to_string(angle) + ")" + "\tTIME: " + inference + "\t" + time_in_HH_MM_SS_MMM();
+                std::cout << diagnosticInfo << std::endl;
+            }
         }
         else
         {

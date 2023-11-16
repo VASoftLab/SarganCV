@@ -14,8 +14,9 @@ OPENCV_VER = 480
 win32 {
     INCLUDEPATH += c:\OpenCV-$${OPENCV_VER}\build\include\
     LIBS += -Lc:\OpenCV-$${OPENCV_VER}\build\x64\vc16\bin
-    LIBS += -Lc:\OpenCV-$${OPENCV_VER}\build\x64\vc16\lib
-    LIBS += -lopencv_world$${OPENCV_VER}d
+    LIBS += -Lc:\OpenCV-$${OPENCV_VER}\build\x64\vc16\lib    
+    Debug:LIBS += -lopencv_world$${OPENCV_VER}d
+    Release:LIBS += -lopencv_world$${OPENCV_VER}
 }
 unix {
     INCLUDEPATH += /usr/include/opencv4

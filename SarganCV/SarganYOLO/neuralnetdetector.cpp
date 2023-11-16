@@ -4,13 +4,18 @@ NeuralNetDetector::NeuralNetDetector(const std::string model, const std::string 
 {
     if (!init_network(model, classes))
     {
-        std::cout << "Neural network been inited!" << std::endl;
-        std::cout << "Input width: " << input_width << std::endl;
-        std::cout << "Input height: " << input_height << std::endl;
+        if (DIAGNOSTIC_LOG)
+        {
+            std::cout << "The neural network has been initiated successfully!" << std::endl;
+            std::cout << "Input width: " << input_width << std::endl;
+            std::cout << "Input height: " << input_height << std::endl;
+        }
+
     }
     else
     {
-        std::cerr << "Failed to init neural network!" << std::endl;
+        if (DIAGNOSTIC_LOG)
+            std::cerr << "The neural network initialization ERROR!" << std::endl;
     }
 }
 
@@ -20,13 +25,17 @@ NeuralNetDetector::NeuralNetDetector(const std::string model, const std::string 
     input_height = height;
     if (!init_network(model, classes))
     {
-        std::cout << "Neural network been inited!" << std::endl;
-        std::cout << "Input width: " << input_width << std::endl;
-        std::cout << "Input height: " << input_height << std::endl;
+        if (DIAGNOSTIC_LOG)
+        {
+            std::cout << "The neural network has been initiated successfully!" << std::endl;
+            std::cout << "Input width: " << input_width << std::endl;
+            std::cout << "Input height: " << input_height << std::endl;
+        }
     }
     else
     {
-        std::cerr << "Failed to init neural network!" << std::endl;
+        if (DIAGNOSTIC_LOG)
+            std::cerr << "The neural network initialization ERROR!" << std::endl;
     }
 }
 
@@ -41,7 +50,8 @@ NeuralNetDetector::NeuralNetDetector(const std::string model, const std::string 
 
     if (!classes_file)
     {
-        std::cerr << "Failed to open classes names!\n";
+        if (DIAGNOSTIC_LOG)
+            std::cerr << "Failed to open classes names!\n";
         return ENOENT;
     }
     while (std::getline(classes_file, line))
