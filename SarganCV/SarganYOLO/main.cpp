@@ -1,16 +1,16 @@
-#include <opencv2/opencv.hpp>
+#define _USE_MATH_DEFINES
 
 #include <iostream>
 #include <fstream>
 #include <cerrno>
 #include <filesystem>
 #include <chrono>
+#include <cmath>
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include <opencv2/videoio.hpp>
 #include <opencv2/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
 
 #include "nadjieb/streamer.hpp"
 using MJPEGStreamer = nadjieb::MJPEGStreamer;
@@ -24,11 +24,14 @@ static const float IMG_HEIGHT  = 640;
 ///////////////////////////////////////////////////////////////////////////////
 // !!!ЗНАЧЕНИЕ УГЛА ОБЗОРА ДОЛЖНО БЫТЬ ИЗМЕНЕНО ПОД КАМЕРУ НА АППАРАТЕ!!!
 ///////////////////////////////////////////////////////////////////////////////
-static const float CAMERA_ANGLE = /*60*/78;
+static const float CAMERA_ANGLE = 80/*60*/;
 ///////////////////////////////////////////////////////////////////////////////
 
 // Размеры прицела
 static const float SIGHT_WIDTH = 50;
+
+// Горизонтальная линейка
+static const int RULER_H = 40;
 
 namespace fs = std::filesystem;
 
@@ -55,7 +58,6 @@ std::string time_in_HH_MM_SS_MMM()
     oss << '.' << std::setfill('0') << std::setw(3) << ms.count();
     return oss.str();
 }
-
 
 int main()
 {
@@ -113,7 +115,7 @@ int main()
 
     // Получить разрешение камеры по горизонтали и вертикали
     double FRAME_WIDTH = source.get(cv::CAP_PROP_FRAME_WIDTH);
-    double FRAME_HEIGHT  = source.get(cv::CAP_PROP_FRAME_HEIGHT);
+    double FRAME_HEIGHT = source.get(cv::CAP_PROP_FRAME_HEIGHT);
 
     if (DIAGNOSTIC_LOG)
         std::cout << "Camera resolution: " << FRAME_WIDTH << " x " << FRAME_HEIGHT << std::endl;
@@ -333,6 +335,99 @@ int main()
         }
         ///////////////////////////////////////////////////////////////////////
 
+        ///////////////////////////////////////////////////////////////////////
+        // Отрисовка горизонтальной линейки
+        ///////////////////////////////////////////////////////////////////////
+
+        int fontFace = cv::FONT_HERSHEY_PLAIN;
+        double fontScale = 1;
+        int thickness = 1;
+        int baseline = 0;
+
+        cv::Point rulerV30N;
+        cv::Point rulerV30P;
+        cv::Point rulerV20N;
+        cv::Point rulerV20P;
+        cv::Point rulerV10N;
+        cv::Point rulerV10P;
+        cv::Point rulerVZer;
+
+        double K = FRAME_WIDTH / FRAME_HEIGHT;
+        K = 1;
+
+        double delta30 = (double)RULER_H * tan(30 * M_PI / 180) * K;
+        double delta20 = (double)RULER_H * tan(20 * M_PI / 180) * K;
+        double delta10 = (double)RULER_H * tan(10 * M_PI / 180) * K;
+
+        // 30
+        rulerV30N.x = (int)(FRAME_WIDTH / 2.0) - (int)((double)FRAME_HEIGHT * tan(30 * M_PI / 180) * K) + (int)delta30;
+        rulerV30P.x = (int)(FRAME_WIDTH / 2.0) + (int)((double)FRAME_HEIGHT * tan(30 * M_PI / 180) * K) - (int)delta30;
+        // 20
+        rulerV20N.x = (int)(FRAME_WIDTH / 2.0) - (int)((double)FRAME_HEIGHT * tan(20 * M_PI / 180) * K) + (int)delta20;
+        rulerV20P.x = (int)(FRAME_WIDTH / 2.0) + (int)((double)FRAME_HEIGHT * tan(20 * M_PI / 180) * K) - (int)delta20;
+        // 10
+        rulerV10N.x = (int)(FRAME_WIDTH / 2.0) - (int)((double)FRAME_HEIGHT * tan(10 * M_PI / 180) * K) + (int)delta10;
+        rulerV10P.x = (int)(FRAME_WIDTH / 2.0) + (int)((double)FRAME_HEIGHT * tan(10 * M_PI / 180) * K) - (int)delta10;
+
+        rulerVZer.x = (int)(FRAME_WIDTH / 2.0);
+        rulerV30N.y = RULER_H;
+        rulerV30P.y = RULER_H;
+        rulerV20N.y = RULER_H;
+        rulerV20P.y = RULER_H;
+        rulerV10N.y = RULER_H;
+        rulerV10P.y = RULER_H;
+        rulerVZer.y = RULER_H;
+
+        int lw = 2;
+        int dw = 7;
+        int tw = 5;
+
+        cv::line(img, rulerV30N, rulerV30P, CV_RGB(255, 255, 255), lw, 0);
+        cv::line(img, rulerV30N, cv::Point(rulerV30N.x, rulerV30N.y - dw), CV_RGB(255, 255, 255), lw, 0);
+        cv::line(img, rulerV30P, cv::Point(rulerV30P.x, rulerV30P.y - dw), CV_RGB(255, 255, 255), lw, 0);
+        cv::line(img, rulerV20N, cv::Point(rulerV20N.x, rulerV20N.y - dw), CV_RGB(255, 255, 255), lw, 0);
+        cv::line(img, rulerV20P, cv::Point(rulerV20P.x, rulerV20P.y - dw), CV_RGB(255, 255, 255), lw, 0);
+        cv::line(img, rulerV10N, cv::Point(rulerV10N.x, rulerV10N.y - dw), CV_RGB(255, 255, 255), lw, 0);
+        cv::line(img, rulerV10P, cv::Point(rulerV10P.x, rulerV10P.y - dw), CV_RGB(255, 255, 255), lw, 0);
+        cv::line(img, cv::Point(rulerVZer.x, rulerVZer.y - dw), cv::Point(rulerVZer.x, rulerVZer.y + dw), CV_RGB(255, 255, 255), lw, 0);
+
+        cv::Size textSize30N = cv::getTextSize("-30", fontFace, fontScale, thickness, &baseline);
+        cv::Size textSize30P = cv::getTextSize("+30", fontFace, fontScale, thickness, &baseline);
+        cv::Size textSize20N = cv::getTextSize("-20", fontFace, fontScale, thickness, &baseline);
+        cv::Size textSize20P = cv::getTextSize("+20", fontFace, fontScale, thickness, &baseline);
+        cv::Size textSize10N = cv::getTextSize("-10", fontFace, fontScale, thickness, &baseline);
+        cv::Size textSize10P = cv::getTextSize("+10", fontFace, fontScale, thickness, &baseline);
+        cv::Size textSizeZer = cv::getTextSize("0.0", fontFace, fontScale, thickness, &baseline);
+
+        cv::Point textOrg30N(rulerV30N.x - textSize30N.width / 2, rulerV30N.y - textSize30N.height - tw);
+        cv::Point textOrg30P(rulerV30P.x - textSize30P.width / 2, rulerV30P.y - textSize30P.height - tw);
+        cv::Point textOrg20N(rulerV20N.x - textSize20N.width / 2, rulerV20N.y - textSize20N.height - tw);
+        cv::Point textOrg20P(rulerV20P.x - textSize20P.width / 2, rulerV20P.y - textSize20P.height - tw);
+        cv::Point textOrg10N(rulerV10N.x - textSize10N.width / 2, rulerV10N.y - textSize10N.height - tw);
+        cv::Point textOrg10P(rulerV10P.x - textSize10P.width / 2, rulerV10P.y - textSize10P.height - tw);
+        cv::Point textOrgZer(rulerVZer.x - textSizeZer.width / 2, rulerVZer.y - textSizeZer.height - tw);
+
+        cv::putText(img, "-30", textOrg30N, fontFace, fontScale, CV_RGB(255, 255, 255), thickness);
+        cv::putText(img, "+30", textOrg30P, fontFace, fontScale, CV_RGB(255, 255, 255), thickness);
+        cv::putText(img, "-20", textOrg20N, fontFace, fontScale, CV_RGB(255, 255, 255), thickness);
+        cv::putText(img, "+20", textOrg20P, fontFace, fontScale, CV_RGB(255, 255, 255), thickness);
+        cv::putText(img, "-10", textOrg10N, fontFace, fontScale, CV_RGB(255, 255, 255), thickness);
+        cv::putText(img, "+10", textOrg10P, fontFace, fontScale, CV_RGB(255, 255, 255), thickness);
+        cv::putText(img, "0.0", textOrgZer, fontFace, fontScale, CV_RGB(255, 255, 255), thickness);
+
+        if (boxes.size() > 0)
+        {
+            cv::Point center = (boxes[bigestIndex].br() + boxes[bigestIndex].tl()) * 0.5;
+            cv::Point centerN(center.x - 10, RULER_H + 12);
+            cv::Point centerP(center.x + 10, RULER_H + 12);
+            cv::Point centerZ(center.x, RULER_H + 2);
+
+            if ((rulerV30N.x <= centerZ.x) && (rulerV30P.x >= centerZ.x))
+            {
+                cv::line(img, centerN, centerZ, CV_RGB(255, 0, 0), 2, 0);
+                cv::line(img, centerP, centerZ, CV_RGB(255, 0, 0), 2, 0);
+            }
+        }
 
         // Вывод результатов (опционально)
         if (true)
