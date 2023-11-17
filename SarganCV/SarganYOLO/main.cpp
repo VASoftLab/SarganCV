@@ -122,8 +122,12 @@ int main()
 
     // Путь к модели и файлу с классами
     fs::path nn_dir ("nn");
-    fs::path nn_onnx ("yolov5s.onnx");
-    fs::path nn_names ("coco.names");
+    // Debug NN
+    //fs::path nn_onnx ("yolov5s.onnx");
+    //fs::path nn_names ("coco.names");
+    // Release NN
+    fs::path nn_onnx ("ship.onnx");
+    fs::path nn_names ("ship.names");
 
     const fs::path model_path = fs::current_path() / nn_dir / nn_onnx;
     const fs::path classes_path = fs::current_path() / nn_dir / nn_names;
