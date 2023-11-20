@@ -20,7 +20,8 @@ win32 {
 }
 unix {
     INCLUDEPATH += /usr/include/opencv4
-    LIBS += -L/usr/local/lib -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_imgproc -lopencv_dnn
+    INCLUDEPATH += /usr/local/include/opencv4
+    LIBS += -L/usr/local/lib -lopencv_core -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lopencv_imgproc -lopencv_dnn -pthread
 }
 
 HEADERS += \
