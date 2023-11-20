@@ -61,7 +61,7 @@ std::string time_in_HH_MM_SS_MMM()
 
 int main()
 {
-    cv::VideoCapture source;
+    cv::VideoCapture source(0);
 
     // Источник изображений по умолчанию
     // cv::VideoCapture source(1, cv::CAP_GSTREAMER);
@@ -71,7 +71,7 @@ int main()
     source.open(0, cv::CAP_DSHOW);
 #else
     // source.open(0, cv::CAP_ANY);
-    source.open(0, cv::CAP_GSTREAMER);
+    // source.open(0, cv::CAP_GSTREAMER);
 #endif
     source.set(cv::CAP_PROP_FPS, 30);
 
