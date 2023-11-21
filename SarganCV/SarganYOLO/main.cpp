@@ -17,9 +17,26 @@ using MJPEGStreamer = nadjieb::MJPEGStreamer;
 
 #include "neuralnetdetector.h"
 
-/** Параметры картинки */
+///////////////////////////////////////////////////////////////////////////////
+// ГЛОБАЛЬНЫЕ НАСТРОЙКИ ПРИЛОЖЕНИЯ
+//////////////////////////////////////////////////////////////////////////////////
 static const float IMG_WIDTH = 640;
 static const float IMG_HEIGHT  = 640;
+static const double CAMERA_FPS = 30;        // FPS камеры
+static const double VIDEO_FPS = 5;          // FPS видеоролика
+static const double FRAME_SCALE = 0.5;      // Коэф-т масштабирования картинки
+static const short VIDEO_DURATION_SEC = 10; // Длительность видеоролика
+static const short VIDEO_FILES_COUNT = 10;  // Максимальное кол-во видеофайлов
+
+static const std::string NN_DIR = "nn";     // Папка в которой лежит сеть
+
+// Для отладки
+static const std::string NN_ONNX = "debug.onnx";    // Файл модели
+static const std::string NN_NAMES = "debug.names";  // Файл названий классов
+
+// Для релиза
+//static const std::string NN_ONNX = "ship.onnx";
+//static const std::string NN_NAMES = "ship.names";
 
 ///////////////////////////////////////////////////////////////////////////////
 // !!!ЗНАЧЕНИЕ УГЛА ОБЗОРА ДОЛЖНО БЫТЬ ИЗМЕНЕНО ПОД КАМЕРУ НА АППАРАТЕ!!!
@@ -72,6 +89,18 @@ std::string getTimeStamp()
     return oss.str();
 }
 
+std::string getVideoFileName()
+{
+    using namespace std::chrono;
+    auto now = system_clock::now();
+    auto ms = duration_cast<milliseconds>(now.time_since_epoch()) % 1000;
+    auto timer = system_clock::to_time_t(now);
+    std::tm bt = *std::localtime(&timer);
+    std::ostringstream oss;
+    oss << std::put_time(&bt, "sargan_%d%m%Y%H%M%S.avi");
+    return oss.str();
+}
+
 int main()
 {
     cv::VideoCapture source;
@@ -87,7 +116,7 @@ int main()
     source.open(0, cv::CAP_DSHOW);
 #endif
 
-    source.set(cv::CAP_PROP_FPS, 30);
+    source.set(cv::CAP_PROP_FPS, CAMERA_FPS);
     cv::Mat frame;
 
     ///////////////////////////////////////////////////////////////////////////
@@ -111,13 +140,10 @@ int main()
         std::cout << "Camera resolution: " << FRAME_WIDTH << " x " << FRAME_HEIGHT << std::endl;
 
     // Путь к модели и файлу с классами
-    fs::path nn_dir ("nn");
-    // Debug NN
-    fs::path nn_onnx ("debug.onnx");
-    fs::path nn_names ("debug.names");
-    // Release NN
-    //fs::path nn_onnx ("ship.onnx");
-    //fs::path nn_names ("ship.names");
+
+    fs::path nn_dir (NN_DIR);
+    fs::path nn_onnx (NN_ONNX);
+    fs::path nn_names (NN_NAMES);
 
     const fs::path model_path = fs::current_path() / nn_dir / nn_onnx;
     const fs::path classes_path = fs::current_path() / nn_dir / nn_names;
@@ -223,20 +249,82 @@ int main()
     cv::Point textOrg10P;
     cv::Point textOrgZer;
 
+    // Переменная для сохранения видео
+    cv::VideoWriter video;
+    fs::path video_dir ("video");
+    fs::path video_path;
+    cv::Mat videoImg;
+
+    std::vector<std::string> video_files;
+
+    // Таймер записи
+    std::chrono::time_point<std::chrono::system_clock> videoStartTime;
+    std::chrono::time_point<std::chrono::system_clock> videoEndTime;
+    bool isRecordStarted = false;
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Удаляем старые файлы
+    ///////////////////////////////////////////////////////////////////////////
+
+    // Удаляет вместе с папкой video
+    // std::filesystem::remove_all(fs::current_path() / video_dir);
+
+    for (const auto& entry : std::filesystem::directory_iterator(fs::current_path() / video_dir))
+        std::filesystem::remove_all(entry.path());
+
     ///////////////////////////////////////////////////////////////////////////
     // Бесконечный цикл с захватом видео и детектором
     ///////////////////////////////////////////////////////////////////////////
+
     while(cv::waitKey(1) < 1)
-    {
+    {        
         ///////////////////////////////////////////////////////////////////////
         // Захват текущего кадра
         ///////////////////////////////////////////////////////////////////////
         source >> frame;
+
         if (frame.empty())
         {
             cv::waitKey();
             break;
         }
+
+        // Создаем объект для записи видео
+        if (!isRecordStarted)
+        {
+            video_path = fs::current_path() / video_dir / getVideoFileName();
+
+            // Если размерность вектора больше допустимой, удаляем первый эл-т
+            if (video_files.size() >= VIDEO_FILES_COUNT)
+            {
+                // Удалить файл
+                std::filesystem::remove(video_files.front()); //video_files.at(0)
+                // Извлечь имя удаленного файла из вектора
+                video_files.erase(video_files.begin());
+            }
+
+            // Запоминаем файл в векторе
+            video_files.push_back(video_path.u8string());
+
+            std::cout << video_path.u8string() << std::endl;
+            video = cv::VideoWriter(video_path.u8string(),
+                                    //cv::VideoWriter::fourcc('X','V','I','D'),
+                                    cv::VideoWriter::fourcc('D','I','V','X'),
+                                    //cv::VideoWriter::fourcc('M','J','P','G'),
+                                    VIDEO_FPS,
+                                    cv::Size(FRAME_WIDTH * FRAME_SCALE,
+                                             FRAME_HEIGHT * FRAME_SCALE));
+
+            // TODO: Разобраться с флагами настройки качества изображения
+            // video.set(cv::VIDEOWRITER_PROP_QUALITY, 10);
+
+            // Запоминаем время начала записи
+            videoStartTime = std::chrono::system_clock::now();
+
+            // Установка флага - Старт записи
+            isRecordStarted = true;
+        }
+
 
         ///////////////////////////////////////////////////////////////////////
         // Отработка детектора
@@ -349,10 +437,9 @@ int main()
             //    direction = "HOLD";
             //}
 
+            // Алгоритм удержания цели только по оси абцисс
             if ((boardBoxPt1.x <= center.x) && (center.x <= boardBoxPt2.x))
-            {
                 direction = "HOLD";
-            }
 
             // Время работы детектора
             ssTime.str(std::string()); // Очистка строкового стримера
@@ -486,30 +573,22 @@ int main()
         // Вывод результатов (опционально)
         if (true)
         {
-            /*
-            std::cout << "class_ids: ";
-            for (auto element : class_ids)
-            {
-                std::cout << element << " ";
-            }
-            std::cout << std::endl;
-            std::cout << "classes: ";
-            for (auto element : classes)
-            {
-                std::cout << element << " ";
-            }
-            std::cout << std::endl;
-            std::cout << "confidences: ";
-            for (auto element : confidences)
-            {
-                std::cout << element << " ";
-            }
-            std::cout << std::endl;
-            std::cout << "inference time: " << detector.get_inference() << std::endl;
+            //std::cout << std::endl << "class_ids: ";
+            //for (auto element : class_ids)
+            //    std::cout << element << " ";
 
-            std::cout << detector.get_info();
-            */
+            //std::cout << std::endl << "classes: ";
+            //for (auto element : classes)
+            //    std::cout << element << " ";
 
+            //std::cout << std::endl << "confidences: ";
+            //for (auto element : confidences)
+            //    std::cout << element << " ";
+
+            //std::cout << std::endl << "inference time: " << detector.get_inference() << std::endl;
+            //std::cout << std::endl << detector.get_info();
+
+            // Дублируем видео в окне
             cv::imshow("SarganYOLO", img);
         }
 
@@ -518,12 +597,30 @@ int main()
 
         // Выгрузка изображения в поток http://localhost:8080/sargan
         streamer.publish("/sargan", std::string(streamerBuf.begin(), streamerBuf.end()));
+
+        // Сохраняем в видеофайл
+
+        // Уменьшаем картинку в два раза
+        resize(img, videoImg, cv::Size(), FRAME_SCALE, FRAME_SCALE, cv::INTER_CUBIC);
+        video.write(videoImg);
+
+        videoEndTime = std::chrono::system_clock::now();
+
+        // Новый видео файл каждые 10 секунд
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(videoEndTime - videoStartTime).count() / 1000 > VIDEO_DURATION_SEC)
+        {
+            video.release();
+            isRecordStarted = false;
+        }
     }
 
     // Остановка стримера
     streamer.stop();
 
-    // cv::waitKey(0);
+    // Освобождение занятых ресурсов
+    source.release();
+    video.release();
+
     cv::destroyAllWindows();
     return 0;
 }
