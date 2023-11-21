@@ -3,11 +3,12 @@ TEMPLATE = app
 CONFIG += console c++17
 CONFIG -= app_bundle
 # CONFIG -= qt
-QT += core
+QT += core network
 
 SOURCES += \
         main.cpp \
-        neuralnetdetector.cpp
+        neuralnetdetector.cpp \
+        udppacket.cpp
 
 
 OPENCV_VER = 480
@@ -26,4 +27,5 @@ unix {
 }
 
 HEADERS += \
-    neuralnetdetector.h
+    neuralnetdetector.h \
+    udppacket.h

@@ -356,9 +356,11 @@ Makefile: SarganYOLO.pro C:\Qt\6.3.2\msvc2019_64\mkspecs\win32-msvc\qmake.conf C
 		C:\Qt\6.3.2\msvc2019_64\mkspecs\features\lex.prf \
 		SarganYOLO.pro \
 		C:\Qt\6.3.2\msvc2019_64\lib\Qt6Gui.prl \
+		C:\Qt\6.3.2\msvc2019_64\lib\Qt6Network.prl \
 		C:\Qt\6.3.2\msvc2019_64\lib\Qt6Core.prl \
 		C:\Qt\6.3.2\msvc2019_64\mkspecs\features\build_pass.prf \
 		C:\Qt\6.3.2\msvc2019_64\lib\Qt6Guid.prl \
+		C:\Qt\6.3.2\msvc2019_64\lib\Qt6Networkd.prl \
 		C:\Qt\6.3.2\msvc2019_64\lib\Qt6Cored.prl
 	$(QMAKE) -o Makefile SarganYOLO.pro -spec win32-msvc "CONFIG+=qtquickcompiler"
 C:\Qt\6.3.2\msvc2019_64\mkspecs\features\spec_pre.prf:
@@ -633,9 +635,11 @@ C:\Qt\6.3.2\msvc2019_64\mkspecs\features\yacc.prf:
 C:\Qt\6.3.2\msvc2019_64\mkspecs\features\lex.prf:
 SarganYOLO.pro:
 C:\Qt\6.3.2\msvc2019_64\lib\Qt6Gui.prl:
+C:\Qt\6.3.2\msvc2019_64\lib\Qt6Network.prl:
 C:\Qt\6.3.2\msvc2019_64\lib\Qt6Core.prl:
 C:\Qt\6.3.2\msvc2019_64\mkspecs\features\build_pass.prf:
 C:\Qt\6.3.2\msvc2019_64\lib\Qt6Guid.prl:
+C:\Qt\6.3.2\msvc2019_64\lib\Qt6Networkd.prl:
 C:\Qt\6.3.2\msvc2019_64\lib\Qt6Cored.prl:
 qmake: FORCE
 	@$(QMAKE) -o Makefile SarganYOLO.pro -spec win32-msvc "CONFIG+=qtquickcompiler"

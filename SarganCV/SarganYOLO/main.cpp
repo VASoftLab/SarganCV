@@ -18,6 +18,9 @@ using MJPEGStreamer = nadjieb::MJPEGStreamer;
 #include "neuralnetdetector.h"
 
 #include <QSettings>
+#include <QUdpSocket>
+
+#include "udppacket.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // ГЛОБАЛЬНЫЕ НАСТРОЙКИ ПРИЛОЖЕНИЯ (ЗНАЧЕНИЯ ПО УМОЛЧАНИЮ)
@@ -51,6 +54,10 @@ static float SIGHT_WIDTH = 50;
 
 // Горизонтальная линейка
 static int RULER_H = 40;
+
+QUdpSocket udpSocket;
+QHostAddress UDP_HOST;
+int UDP_PORT;
 
 namespace fs = std::filesystem;
 
@@ -125,6 +132,9 @@ int main()
     SIGHT_WIDTH = settings.value("SIGHT_WIDTH").toFloat();
     RULER_H = settings.value("RULER_H").toUInt();
 
+    UDP_HOST = QHostAddress(settings.value("UDP_HOST").toString());
+    UDP_PORT = settings.value("UDP_PORT").toUInt();
+
     std::cout << "IMG_WIDTH: " << IMG_WIDTH << std::endl;
     std::cout << "IMG_HEIGHT: " << IMG_HEIGHT << std::endl;
     std::cout << "CAMERA_FPS: " << CAMERA_FPS << std::endl;
@@ -138,6 +148,8 @@ int main()
     std::cout << "CAMERA_ANGLE: " << CAMERA_ANGLE << std::endl;
     std::cout << "SIGHT_WIDTH: " << SIGHT_WIDTH << std::endl;
     std::cout << "RULER_H: " << RULER_H << std::endl;
+    std::cout << "UDP_HOST: " << UDP_HOST.toString().toStdString() << std::endl;
+    std::cout << "UDP_PORT: " << UDP_PORT << std::endl;
 
     cv::VideoCapture source;
     // Источник изображений по умолчанию
@@ -297,6 +309,9 @@ int main()
     std::chrono::time_point<std::chrono::system_clock> videoStartTime;
     std::chrono::time_point<std::chrono::system_clock> videoEndTime;
     bool isRecordStarted = false;
+
+    // UDP Packet
+    UDPPacket packet;
 
     ///////////////////////////////////////////////////////////////////////////
     // Удаляем старые файлы
@@ -464,7 +479,7 @@ int main()
             angle = findAngleF(FRAME_WIDTH, center.x);
 
             // Команда управления лево / право
-            direction = center.x > FRAME_WIDTH / 2 ? "RIGTH" : "LEFT";
+            direction = center.x > FRAME_WIDTH / 2 ? "RIGHT" : "LEFT";
 
             // Если цель находится в границах прицела - удерживаем курс
             //if ((boardBoxPt1.x <= center.x) && (center.x <= boardBoxPt2.x) &&
@@ -494,6 +509,21 @@ int main()
                 diagnosticInfo = "CMD:\t(" + direction + ":" + std::to_string(angle) + ")" + "\tTIME: " + inference + "\t" + timestamp;
                 std::cout << diagnosticInfo << std::endl;
             }
+
+            ///////////////////////////////////////////////////////////////////
+            // Формируем пакет для передачи по UDP
+            ///////////////////////////////////////////////////////////////////
+            if (direction == "LEFT")
+                packet.udpCMD = (std::int8_t)(-1);
+            else if (direction == "HOLD")
+                packet.udpCMD = (std::int8_t)(0);
+            else if (direction == "RIGHT")
+                packet.udpCMD = (std::int8_t)(1);
+
+            packet.udpANG = angle;
+
+            udpSocket.writeDatagram(packet.toByteArray(), UDP_HOST, UDP_PORT);
+            ///////////////////////////////////////////////////////////////////
         }
         else
         {
