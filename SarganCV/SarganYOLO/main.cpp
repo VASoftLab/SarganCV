@@ -17,22 +17,24 @@ using MJPEGStreamer = nadjieb::MJPEGStreamer;
 
 #include "neuralnetdetector.h"
 
-///////////////////////////////////////////////////////////////////////////////
-// ГЛОБАЛЬНЫЕ НАСТРОЙКИ ПРИЛОЖЕНИЯ
-//////////////////////////////////////////////////////////////////////////////////
-static const float IMG_WIDTH = 640;
-static const float IMG_HEIGHT  = 640;
-static const double CAMERA_FPS = 30;        // FPS камеры
-static const double VIDEO_FPS = 5;          // FPS видеоролика
-static const double FRAME_SCALE = 0.5;      // Коэф-т масштабирования картинки
-static const short VIDEO_DURATION_SEC = 10; // Длительность видеоролика
-static const short VIDEO_FILES_COUNT = 10;  // Максимальное кол-во видеофайлов
+#include <QSettings>
 
-static const std::string NN_DIR = "nn";     // Папка в которой лежит сеть
+///////////////////////////////////////////////////////////////////////////////
+// ГЛОБАЛЬНЫЕ НАСТРОЙКИ ПРИЛОЖЕНИЯ (ЗНАЧЕНИЯ ПО УМОЛЧАНИЮ)
+//////////////////////////////////////////////////////////////////////////////////
+static float IMG_WIDTH = 640;
+static float IMG_HEIGHT  = 640;
+static double CAMERA_FPS = 30;        // FPS камеры
+static double VIDEO_FPS = 5;          // FPS видеоролика
+static double FRAME_SCALE = 0.5;      // Коэф-т масштабирования картинки
+static short VIDEO_DURATION_SEC = 10; // Длительность видеоролика
+static short VIDEO_FILES_COUNT = 10;  // Максимальное кол-во видеофайлов
+
+static std::string NN_DIR = "nn";     // Папка в которой лежит сеть
 
 // Для отладки
-static const std::string NN_ONNX = "debug.onnx";    // Файл модели
-static const std::string NN_NAMES = "debug.names";  // Файл названий классов
+static std::string NN_ONNX = "debug.onnx";    // Файл модели
+static std::string NN_NAMES = "debug.names";  // Файл названий классов
 
 // Для релиза
 //static const std::string NN_ONNX = "ship.onnx";
@@ -41,14 +43,14 @@ static const std::string NN_NAMES = "debug.names";  // Файл названий
 ///////////////////////////////////////////////////////////////////////////////
 // !!!ЗНАЧЕНИЕ УГЛА ОБЗОРА ДОЛЖНО БЫТЬ ИЗМЕНЕНО ПОД КАМЕРУ НА АППАРАТЕ!!!
 ///////////////////////////////////////////////////////////////////////////////
-static const float CAMERA_ANGLE = 80/*60*/;
+static float CAMERA_ANGLE = 80;
 ///////////////////////////////////////////////////////////////////////////////
 
 // Размеры прицела
-static const float SIGHT_WIDTH = 50;
+static float SIGHT_WIDTH = 50;
 
 // Горизонтальная линейка
-static const int RULER_H = 40;
+static int RULER_H = 40;
 
 namespace fs = std::filesystem;
 
@@ -103,6 +105,40 @@ std::string getVideoFileName()
 
 int main()
 {
+    ///////////////////////////////////////////////////////////////////////////
+    // Чтение настроек
+    ///////////////////////////////////////////////////////////////////////////
+    fs::path pathToSettings = fs::current_path() / "settings.ini";
+    QSettings settings (QString::fromStdString(pathToSettings.u8string()), QSettings::IniFormat);
+    settings.beginGroup("Settings");
+    IMG_WIDTH = settings.value("IMG_WIDTH").toFloat();
+    IMG_HEIGHT = settings.value("IMG_HEIGHT").toFloat();
+    CAMERA_FPS = settings.value("CAMERA_FPS").toDouble();
+    VIDEO_FPS = settings.value("VIDEO_FPS").toDouble();
+    FRAME_SCALE = settings.value("FRAME_SCALE").toDouble();
+    VIDEO_DURATION_SEC = settings.value("VIDEO_DURATION_SEC").toUInt();
+    VIDEO_FILES_COUNT = settings.value("VIDEO_FILES_COUNT").toUInt();
+    NN_DIR = settings.value("NN_DIR").toString().toStdString();
+    NN_ONNX = settings.value("NN_ONNX").toString().toStdString();
+    NN_NAMES = settings.value("NN_NAMES").toString().toStdString();
+    CAMERA_ANGLE = settings.value("CAMERA_ANGLE").toFloat();
+    SIGHT_WIDTH = settings.value("SIGHT_WIDTH").toFloat();
+    RULER_H = settings.value("RULER_H").toUInt();
+
+    std::cout << "IMG_WIDTH: " << IMG_WIDTH << std::endl;
+    std::cout << "IMG_HEIGHT: " << IMG_HEIGHT << std::endl;
+    std::cout << "CAMERA_FPS: " << CAMERA_FPS << std::endl;
+    std::cout << "VIDEO_FPS: " << VIDEO_FPS << std::endl;
+    std::cout << "FRAME_SCALE: " << FRAME_SCALE << std::endl;
+    std::cout << "VIDEO_DURATION_SEC: " << VIDEO_DURATION_SEC << std::endl;
+    std::cout << "VIDEO_FILES_COUNT: " << VIDEO_FILES_COUNT << std::endl;
+    std::cout << "NN_DIR: " << NN_DIR << std::endl;
+    std::cout << "NN_ONNX: " << NN_ONNX << std::endl;
+    std::cout << "NN_NAMES: " << NN_NAMES << std::endl;
+    std::cout << "CAMERA_ANGLE: " << CAMERA_ANGLE << std::endl;
+    std::cout << "SIGHT_WIDTH: " << SIGHT_WIDTH << std::endl;
+    std::cout << "RULER_H: " << RULER_H << std::endl;
+
     cv::VideoCapture source;
     // Источник изображений по умолчанию
 
