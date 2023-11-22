@@ -1,0 +1,8 @@
+<RCC>
+    <qresource prefix="/images">
+        <file>png/arrow-left.png</file>
+        <file>png/arrow-right.png</file>
+        <file>png/sevsu.png</file>
+        <file>png/target.png</file>
+    </qresource>
+</RCC>

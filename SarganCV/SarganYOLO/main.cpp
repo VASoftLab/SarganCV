@@ -530,6 +530,10 @@ int main()
             // textInfo = " RES: (" + std::to_string((int)FRAME_WIDTH) + "x" + std::to_string((int)FRAME_HEIGHT) + ")";
             textInfo = "TIME: " + timestamp;
             cv::putText(img, textInfo, cv::Point(10, img.rows - 10), cv::FONT_HERSHEY_PLAIN, 1, CV_RGB(0, 0, 255), 1);
+
+            packet.udpCMD = (std::int8_t)(-101);
+            packet.udpANG = 0;
+            udpSocket.writeDatagram(packet.toByteArray(), UDP_HOST, UDP_PORT);
         }
         ///////////////////////////////////////////////////////////////////////
         // Отрисовка бортовых бокса и прицела
