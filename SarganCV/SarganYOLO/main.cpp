@@ -157,7 +157,7 @@ int main()
 #ifdef _WIN32
     // source.open(0, cv::CAP_ANY);
     // source.open(0, cv::CAP_GSTREAMER);
-    source.open(0, cv::CAP_DSHOW);
+    source.open(1, cv::CAP_DSHOW);
 #else
     // source.open(0, cv::CAP_ANY);
     // source.open(0, cv::CAP_GSTREAMER);
